@@ -33,9 +33,9 @@
 							</div>
 
 							<div class="form-group col-md-6">
-								<label for="equipment_id"> Equipo Clinico </label>
+								<label for="equipment_id"> Numero de Serie del Equipo Clinico</label>
 								<select name="equipment_id" class="form-control">
-									<option value="{{ $equipo->id }}" selected>{{ $equipo->name }} </option>
+									<option value="{{ $equipo->id }}" selected>{{ $equipo->sr_no }} </option>
 								</select>
 							</div>
 

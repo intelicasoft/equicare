@@ -67,7 +67,7 @@
 						</div> --}}
 						@if (isset($permissions) && $permissions->count() > 0)
                                @include('user_role_permission.table_create')
-            @endif  
+           				@endif  
                               
 						
 

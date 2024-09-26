@@ -139,68 +139,85 @@
           </a>
         </li>
 
+        @if(auth()->user()->hasDirectPermission('View accesories'))
         <li class="{{ $page=='accesories'?'active':'' }}">
             <a href="{{ url('/admin/accesories') }}">
             <i class="fa fa-wrench"></i> <span>Accesorios</span>
           </a>
         </li>
-
+        @endif
+      
+      @if(auth()->user()->hasDirectPermission('View lots'))
         <li class="{{ $page=='lots'?'active':'' }}">
             <a href="{{ url('/admin/lots') }}">
             <i class="fa fa-cubes"></i> <span>Lotes</span>
           </a>
         </li>
-
+      @endif
+      
+      @if(auth()->user()->hasDirectPermission('View brands'))
         <li class="{{ $page=='brands'?'active':'' }}">
           <a href="{{ url('/admin/brands') }}">
             <i class="fa fa-tag"></i> <span>Marcas</span>
           </a>
         </li>
+      @endif
 
+      @if(auth()->user()->hasDirectPermission('View models'))
         <li class="{{ $page=='models'?'active':'' }}">
             <a href="{{ url('/admin/models') }}">
             <i class="fa fa-book"></i> <span>Modelos</span>
           </a>
         </li>
+      @endif
 
-        <li class="{{ $page=='hospitals'?'active':'' }}">
+      @if(auth()->user()->hasDirectPermission('View zones'))
+        <li class="{{ $page=='providers'?'active':'' }}">
           <a href="{{ url('/admin/providers') }}"> 
             <i class="fa fa-truck"></i> <span>Proveedores</span>
           </a>
         </li>
-
+      @endif
+      
+      @if(auth()->user()->hasDirectPermission('View zones'))
         <li class="{{ $page=='zones'?'active':'' }}">
           <a href="{{ url('/admin/zones') }}">
             <i class="fa fa-tag"></i> <span>Zonas</span>
           </a>
         </li>
-
-        <li class="{{ $page=='hospitals'?'active':'' }}">
+      @endif
+      
+      @if(auth()->user()->hasDirectPermission('View tickets'))
+        <li class="{{ $page=='tickets'?'active':'' }}">
             <a href="{{ url('/admin/tickets') }}">
             <i class="fa fa-ticket"></i> <span>Tickets</span>
           </a>
         </li>
+      @endif
 
-        <li class="{{ $page=='hospitals'?'active':'' }}">
+      @if(auth()->user()->hasDirectPermission('View orders'))
+        <li class="{{ $page=='orders'?'active':'' }}">
             <a href="{{ url('/admin/orders') }}">
             <i class="fa fa-file-text-o"></i> <span>Órdenes de servicio</span>
           </a>
         </li>
+      @endif
 
+      @if(auth()->user()->hasDirectPermission('View reviews'))
         <li class="{{ $page=='reviews'?'active':'' }}">
           <a href="{{ url('/admin/reviews') }}">
           <i class="fa fa-file-text-o"></i> <span>Revisiones</span>
           </a>
         </li>
+      @endif
 
-
-@if(auth()->user()->hasDirectPermission('View Hospitals'))
-    <li class="{{ $page=='hospitals'?'active':'' }}">
-        <a href="{{ url('/admin/hospitals') }}">
-            <i class="fa fa-hospital-o"></i> <span>@lang('equicare.hospital')</span>
-        </a>
-    </li>
-@endif
+      @if(auth()->user()->hasDirectPermission('View Hospitals'))
+          <li class="{{ $page=='hospitals'?'active':'' }}">
+              <a href="{{ url('/admin/hospitals') }}">
+                  <i class="fa fa-hospital-o"></i> <span>@lang('equicare.hospital')</span>
+              </a>
+          </li>
+      @endif
 
 {{-- @if(auth()->user()->hasDirectPermission('View QR Generate'))
     <li class="{{ $page=='qr'?'active':'' }}">

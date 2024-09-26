@@ -14,21 +14,66 @@
     <div class="row ">
 
         <body>
-            <style>
+            <style>                
                 .status {
                     padding: 5px;
                     border-radius: 3px;
                     font-weight: bold;
                 }
-            
+
                 .status.abierto {
                     color: white;
                     background-color: green;
                 }
-            
+
                 .status.cerrado {
                     color: white;
                     background-color: red;
+                }
+
+                #preloader6 {
+                    position: relative;
+                    width: 84px; /* Aumentado de 42px a 84px */
+                    height: 84px; /* Aumentado de 42px a 84px */
+                    animation: preloader_6 5s infinite linear;
+                }
+
+                #preloader6 span {
+                    width: 40px;  /* Aumentado de 20px a 40px */
+                    height: 40px; /* Aumentado de 20px a 40px */
+                    position: absolute;
+                    background: red;
+                    display: block;
+                    animation: preloader_6_span 1s infinite linear;
+                }
+
+                #preloader6 span:nth-child(1) {
+                    background: #2ecc71;
+                }
+
+                #preloader6 span:nth-child(2) {
+                    left: 44px; /* Aumentado de 22px a 44px */
+                    background: #9b59b6;
+                    animation-delay: .2s;
+                }
+
+                #preloader6 span:nth-child(3) {
+                    top: 44px; /* Aumentado de 22px a 44px */
+                    background: #3498db;
+                    animation-delay: .4s;
+                }
+
+                #preloader6 span:nth-child(4) {
+                    top: 44px; /* Aumentado de 22px a 44px */
+                    left: 44px; /* Aumentado de 22px a 44px */
+                    background: #f1c40f;
+                    animation-delay: .6s;
+                }
+
+                @keyframes preloader_6_span {
+                    0% { transform: scale(1); }
+                    50% { transform: scale(0.5); }
+                    100% { transform: scale(1); }
                 }
             </style>
 
@@ -36,6 +81,12 @@
                 <!-- main -->
                 <div class="main">
                     @php
+                        use Illuminate\Support\Facades\Log as log;
+                        use Carbon\Carbon;
+
+                        $oneWeekAgo = Carbon::now()->subWeek();
+                        log::info($oneWeekAgo);
+
                         $countHospitals = 0;
                         $countHospitals = \App\Hospital::query()->Hospital()->count();
 
@@ -44,13 +95,33 @@
 
                         $countEquipment = 0;
                         $countEquipment = \App\Equipment::query()->Hospital()->count();
+                        //log count countEquipment
+
+                        // Consultar los usuarios con el número de reseñas en la última semana
+                        $activeUsers = \App\Models\Reviews::select('user_id', \DB::raw('count(*) as reviews_count'))
+                            ->where('created_at', '>=', $oneWeekAgo)
+                            ->groupBy('user_id')
+                            ->orderBy('reviews_count', 'desc')
+                            ->with('user')
+                            ->get();
+
+                        log::info($activeUsers);
+
+                        //query lastTickets
+
+                        // $lastTickets = \App\Models\Tickets::query()->orderBy('created_at', 'desc')->limit(10)->get();
+                        $lastTickets = \App\Models\Tickets::where('status', 1)
+                            ->orderBy('created_at', 'desc')
+                            ->take(10)
+                            ->get();
+
+                        // log::info($lastTickets);
+
                     @endphp
 
                     <!-- cards -->
                     <div class="cardBox">
-
-                        {{-- onclick url --}}
-                        <div class="card" onclick="window.location.href='{{ url('admin/hospitals') }}'">
+                        <div class="card" onclick="showLoadingAndRedirect('{{ url('admin/hospitals') }}')">
                             <div class="cardName">
                                 <div class="numbers">{{ $countHospitals }}</div>
                                 <p>@lang('equicare.hospitals')</p>
@@ -59,9 +130,8 @@
                                 <i class="fa fa-hospital-o"></i>
                             </div>
                         </div>
-
-
-                        <div class="card" onclick="window.location.href='{{ url('admin/equipments') }}'">
+                    
+                        <div class="card" onclick="showLoadingAndRedirect('{{ url('admin/equipments') }}')">
                             <div class="cardName">
                                 <div class="numbers">{{ $countEquipment }}</div>
                                 <p>@lang('equicare.equipments')</p>
@@ -70,9 +140,8 @@
                                 <i class="fa fa-wheelchair"></i>
                             </div>
                         </div>
-
-
-                        <div class="card" onclick="window.location.href='{{ url('admin/tickets') }}'">
+                    
+                        <div class="card" onclick="showLoadingAndRedirect('{{ url('admin/tickets') }}')">
                             <div class="cardName">
                                 <div class="numbers">{{ $countOpenTickets }}</div>
                                 <p>Tickets Abiertos</p>
@@ -81,8 +150,8 @@
                                 <i class="fa fa-wrench"></i>
                             </div>
                         </div>
-
-                        <div class="card" onclick="window.location.href='{{ url('admin/tickets') }}'">
+                    
+                        <div class="card" onclick="showLoadingAndRedirect('{{ url('admin/tickets') }}')">
                             <div class="cardName">
                                 <div class="numbers">{{ $countOpenTickets }}</div>
                                 <p>Tickets Abiertos</p>
@@ -91,35 +160,49 @@
                                 <i class="fa fa-wrench"></i>
                             </div>
                         </div>
-
                     </div>
 
                     <!-- Add Charts -->
+
                     <div class="graphBox">
-                        <div class="box" style="padding: 30px">
-                            <canvas id="equipmentStatusChart"></canvas>
+                        <div class="carrousel-container">
+                            <div class="carrousel"> 
+                                <div class="box">
+                                    <div class="canvas-container">
+                                        <canvas id="equipmentStatusChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="carousel-container">
                             <div class="carousel">
                                 <div class="carousel-item">
                                     <div class="box">
-                                        <canvas id="earning"></canvas>
+                                        <div class="canvas-container">
+                                            <canvas id="earning"></canvas>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="carousel-item">
                                     <div class="box">
-                                        <canvas id="reviewsPerUserYesterdayChart"></canvas>
+                                        <div class="canvas-container">
+                                            <canvas id="reviewsPerUserYesterdayChart"></canvas>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="carousel-item">
                                     <div class="box">
-                                        <canvas id="ticketsClosedIn72HoursPerMonthChart"></canvas>
+                                        <div class="canvas-container">
+                                            <canvas id="ticketsClosedIn72HoursPerMonthChart"></canvas>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="carousel-item">
                                     <div class="box">
-                                        <canvas id="ticketsClosedPerMonthChart"></canvas>
+                                        <div class="canvas-container">
+                                            <canvas id="ticketsClosedPerMonthChart"></canvas>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -129,175 +212,79 @@
                     </div>
 
 
-
-
                     <div class="details">
-                        <!-- order details list -->
                         <div class="recentOrders">
                             <div class="cardHeader">
-                                <h2>Recent Orders</h2>
-                                <a href="#" class="btn">View All</a>
+                                <h2>Tickets Abiertos</h2>
+                                <a href="{{ route('tickets.index') }}" class="btn">Ver todos los tickets</a>
                             </div>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <td>Categoría</td>
-                                        <td>Número de Serie</td>
-                                        <td>Fecha</td>
-                                        <td>Status</td>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>MANTENIMIENTO PREVENTIVO (M)</td>
-                                        <td>123456789</td>
-                                        <td>2024-09-22</td>
-                                        <td><span class="status abierto">Abierto</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>INSTALACIÓN (M)</td>
-                                        <td>987654321</td>
-                                        <td>2024-09-20</td>
-                                        <td><span class="status cerrado">Cerrado</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>REACONDICIONAMIENTO (M)</td>
-                                        <td>567890123</td>
-                                        <td>2024-09-15</td>
-                                        <td><span class="status abierto">Abierto</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>INCIDENCIA CORRECTIVA (I)</td>
-                                        <td>345678901</td>
-                                        <td>2024-09-12</td>
-                                        <td><span class="status cerrado">Cerrado</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>CAPACITACIÓN (M)</td>
-                                        <td>234567890</td>
-                                        <td>2024-09-10</td>
-                                        <td><span class="status abierto">Abierto</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>VERIFICACIÓN (M)</td>
-                                        <td>998877665</td>
-                                        <td>2024-09-08</td>
-                                        <td><span class="status cerrado">Cerrado</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>ASESORIA (I)</td>
-                                        <td>112233445</td>
-                                        <td>2024-09-05</td>
-                                        <td><span class="status abierto">Abierto</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>DESINSTALACIÓN (M)</td>
-                                        <td>443322110</td>
-                                        <td>2024-09-03</td>
-                                        <td><span class="status cerrado">Cerrado</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>ABASTECIMIENTO (I)</td>
-                                        <td>556677889</td>
-                                        <td>2024-09-01</td>
-                                        <td><span class="status abierto">Abierto</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>SISTEMAS TI (I)</td>
-                                        <td>221100998</td>
-                                        <td>2024-08-30</td>
-                                        <td><span class="status cerrado">Cerrado</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>MANTENIMIENTO PREVENTIVO (M)</td>
-                                        <td>778899112</td>
-                                        <td>2024-08-28</td>
-                                        <td><span class="status abierto">Abierto</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>INCIDENCIA CORRECTIVA (I)</td>
-                                        <td>334455667</td>
-                                        <td>2024-08-25</td>
-                                        <td><span class="status cerrado">Cerrado</span></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            
+                            @if($lastTickets->isEmpty())
+                                <p>No hay tickets abiertos en este momento.</p>
+                            @else
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <td>Título</td>
+                                            <td>Categoría</td>
+                                            {{-- <td>Fecha de Creación</td> --}}
+                                            <td>Prioridad</td>
+                                            <td>Estado</td>
+                                            <td>Modelo</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($lastTickets as $ticket)
+                                            <tr>
+                                                <td>{{ $ticket->title }}</td>
+                                                <td>{{ $ticket->category }}</td>
+                                                {{-- <td>{{ $ticket->created_at->format('Y-m-d') }}</td> --}}
+                                                <td>{{ $ticket->priority }}</td>
+                                                <td>
+                                                    <span class="status {{ $ticket->status == 1 ? 'abierto' : 'cerrado' }}">
+                                                        {{ $ticket->status == 1 ? 'Abierto' : 'Cerrado' }}
+                                                    </span>
+                                                </td>
+                                                <td>{{ $ticket->model ?? 'Sin modelo' }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            @endif
                         </div>
 
-                        <!-- New Customers -->
                         <div class="recentCustomers">
                             <div class="cardHeader">
-                                <h2>Recent Customers</h2>
+                                <h2>Usuarios mas activos en los ultimos 7 dias</h2>
                             </div>
                             <table>
-                                <tr>
-                                    <td width="60px">
-                                        <div class="imgBx"><img src="img1.jpg"></div>
-                                    </td>
-                                    <td>
-                                        <h4>David<br><span>Italy</span></h4>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="imgBx"><img src="img2.jpg"></div>
-                                    </td>
-                                    <td>
-                                        <h4>Muhammad<br><span>India</span></h4>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="imgBx"><img src="img3.jpg"></div>
-                                    </td>
-                                    <td>
-                                        <h4>Amelia<br><span>France</span></h4>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="imgBx"><img src="img4.jpg"></div>
-                                    </td>
-                                    <td>
-                                        <h4>Olivia<br><span>USA</span></h4>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="imgBx"><img src="img5.jpg"></div>
-                                    </td>
-                                    <td>
-                                        <h4>Amit<br><span>Japan</span></h4>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="imgBx"><img src="img6.jpg"></div>
-                                    </td>
-                                    <td>
-                                        <h4>Ashraf<br><span>India</span></h4>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="imgBx"><img src="img7.jpg"></div>
-                                    </td>
-                                    <td>
-                                        <h4>Diana<br><span>Malaysia</span></h4>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="imgBx"><img src="img8.jpg"></div>
-                                    </td>
-                                    <td>
-                                        <h4>Amit<br><span>India</span></h4>
-                                    </td>
-                                </tr>
-
+                                @foreach ($activeUsers as $userReview)
+                                    <tr>
+                                        {{-- 
+                                        Si tienes imágenes de perfil dinámicas para los usuarios, puedes descomentar la siguiente sección 
+                                        y asegurarte de que la lógica esté funcionando.
+                                        --}}
+                                        {{-- 
+                                        <td width="60px">
+                                            <div class="imgBx">
+                                                <img src="{{ $userReview->user->profile_image ?? 'default-user.jpg' }}" alt="{{ $userReview->user->name }}">
+                                            </div>
+                                        </td> 
+                                        --}}
+                                        <td>
+                                            <h4>{{ $userReview->user->name }}<br>
+                                                <span>Total de revisiones: {{ $userReview->reviews_count }}</span>
+                                            </h4>
+                                        </td>
+                                    </tr>
+                                @endforeach
                             </table>
                         </div>
+
+
+
+
+
+
                     </div>
                 </div>
             </div>
@@ -308,6 +295,17 @@
             <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
             <script src="{{ asset('assets/js/my_chart.js') }}" type="text/javascript"></script>
 
+            <div id="loading" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255, 255, 255, 0.8); z-index:9999; text-align:center;">
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                    
+                    <div id="preloader6">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
         </body>
     @endsection
     @php
@@ -333,6 +331,33 @@
 
     @section('scripts')
         <script>
+              document.addEventListener("DOMContentLoaded", function() {
+                // Ocultar la pantalla de carga al cargar la página
+                document.getElementById('loading').style.display = 'none';
+            });
+
+            function showLoadingAndRedirect(url) {
+                // Mostrar la pantalla de carga
+                document.getElementById('loading').style.display = 'block';
+
+                // Realizar una solicitud para redirigir a la nueva página y mantener el preloader hasta que la nueva página esté completamente cargada
+                fetch(url, { method: 'GET' })
+                    .then(response => {
+                        // Verificar que la solicitud fue exitosa
+                        if (response.ok) {
+                            // Utilizar un pequeño retraso antes de la redirección para permitir que se vea el preloader y evitar el congelamiento
+                            setTimeout(function() {
+                                window.location.href = url;
+                            }, 200); // Espera 200ms antes de redirigir
+                        } else {
+                            alert('Error al cargar la página.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error en la solicitud:', error);
+                    });
+            }
+
             const purpleGradient = {
                 backgroundColor: [
                     'rgba(65, 22, 87, 1)',
@@ -504,6 +529,7 @@
                     }]
                 },
                 options: {
+                    responsive: true,
                     plugins: {
                         title: {
                             display: true,
@@ -519,7 +545,9 @@
                             position: 'bottom'
                         }
                     }
+
                 }
+
             });
         </script>
     @endsection

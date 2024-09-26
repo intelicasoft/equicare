@@ -63,7 +63,9 @@
                         </div>
                         <div class="form-group col-md-6">
                             <label for="model">Modelo</label>
-                            <input type="text" id="model" name="model" class="form-control" value="{{ old('model') }}" />
+                            <input type="text" id="model" name="model" class="form-control" value="{{ old('model') }}" disabled/>
+                            <input type="hidden" id="model" name="model" value="{{ old('model', $equipment->models->name) }}" />
+
                         </div>
                         <div class="form-group col-md-6">
                             <label for="hospital">Hospital</label>

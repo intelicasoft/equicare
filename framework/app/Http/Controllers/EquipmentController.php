@@ -81,7 +81,7 @@ class EquipmentController extends Controller
                 {
                     return view('equipments.export_excel')->with('equipments', $this->collection);
                 }
-            }, time(). '_equipment.xlsx');
+            }, time() . '_equipment.xlsx');
         } elseif (isset($request->pdf_hidden)) {
 
             $equipments = $equipments->latest()->get();
@@ -144,7 +144,7 @@ class EquipmentController extends Controller
 
         $equipment->latitude = $request->latitude;
         $equipment->longitude = $request->longitude;
-        
+
         $equipment->last_id = $request->last_id;
         $equipment->status = $request->status;
         $equipment->supplies = $request->supplies;
@@ -394,36 +394,36 @@ class EquipmentController extends Controller
             });
 
 
-            //ultimo ticket abierto que no sea de mantenimiento ni instalacion
-            $lastOpenedTicket = Tickets::where('equipment_id', $id)
-                ->where('status', '1')
-                ->where('category', '!=', 'INSTALACIÓN (M)')
-                ->where('category', '!=', 'MANTENIMIENTO PREVENTIVO (M)')
-                ->with('user', 'manager', 'equipment')
-                ->orderBy('created_at', 'desc')
-                ->first();
+        //ultimo ticket abierto que no sea de mantenimiento ni instalacion
+        $lastOpenedTicket = Tickets::where('equipment_id', $id)
+            ->where('status', '1')
+            ->where('category', '!=', 'INSTALACIÓN (M)')
+            ->where('category', '!=', 'MANTENIMIENTO PREVENTIVO (M)')
+            ->with('user', 'manager', 'equipment')
+            ->orderBy('created_at', 'desc')
+            ->first();
 
-            $index['lastOpenedTicket'] = $lastOpenedTicket;
+        $index['lastOpenedTicket'] = $lastOpenedTicket;
 
-            //ultimo ticket de manteniento abierto
-            $lastMaintenanceTicket = Tickets::where('equipment_id', $id)
+        //ultimo ticket de manteniento abierto
+        $lastMaintenanceTicket = Tickets::where('equipment_id', $id)
             ->where('status', '1')
             ->where('category', 'MANTENIMIENTO PREVENTIVO (M)')
             ->with('user', 'manager', 'equipment')
             ->orderBy('created_at', 'desc')
             ->first();
 
-            $index['lastMaintenanceTicket'] = $lastMaintenanceTicket;
+        $index['lastMaintenanceTicket'] = $lastMaintenanceTicket;
 
-            //ultimo ticket de instalacion abierto
-            $lastInstallationTicket = Tickets::where('equipment_id', $id)
+        //ultimo ticket de instalacion abierto
+        $lastInstallationTicket = Tickets::where('equipment_id', $id)
             ->where('status', '1')
             ->where('category', 'INSTALACIÓN (M)')
             ->with('user', 'manager', 'equipment')
             ->orderBy('created_at', 'desc')
             ->first();
 
-            $index['lastInstallationTicket'] = $lastInstallationTicket;
+        $index['lastInstallationTicket'] = $lastInstallationTicket;
 
         // Ordenar por fecha descendente
         $index['data'] = $tickets->sortByDesc('created_at');
@@ -467,21 +467,21 @@ class EquipmentController extends Controller
 
             //ultimo ticket de manteniento abierto
             $lastMaintenanceTicket = Tickets::where('equipment_id', $id)
-            ->where('status', '1')
-            ->where('category', 'MANTENIMIENTO PREVENTIVO (M)')
-            ->with('user', 'manager', 'equipment')
-            ->orderBy('created_at', 'desc')
-            ->first();
+                ->where('status', '1')
+                ->where('category', 'MANTENIMIENTO PREVENTIVO (M)')
+                ->with('user', 'manager', 'equipment')
+                ->orderBy('created_at', 'desc')
+                ->first();
 
             $index['lastMaintenanceTicket'] = $lastMaintenanceTicket;
 
             //ultimo ticket de instalacion abierto
             $lastInstallationTicket = Tickets::where('equipment_id', $id)
-            ->where('status', '1')
-            ->where('category', 'INSTALACIÓN (M)')
-            ->with('user', 'manager', 'equipment')
-            ->orderBy('created_at', 'desc')
-            ->first();
+                ->where('status', '1')
+                ->where('category', 'INSTALACIÓN (M)')
+                ->with('user', 'manager', 'equipment')
+                ->orderBy('created_at', 'desc')
+                ->first();
 
             $index['lastInstallationTicket'] = $lastInstallationTicket;
 
@@ -505,7 +505,7 @@ class EquipmentController extends Controller
     public function hq_history_qr($id)
     {
         Log::info('El valor de la variable id es: ' . $id);
-    
+
         $index['page'] = 'equipments history';
 
         // Encuentra el equipo usando el ID
@@ -542,21 +542,21 @@ class EquipmentController extends Controller
 
         //ultimo ticket de manteniento abierto
         $lastMaintenanceTicket = Tickets::where('equipment_id', $id)
-        ->where('status', '1')
-        ->where('category', 'MANTENIMIENTO PREVENTIVO (M)')
-        ->with('user', 'manager', 'equipment')
-        ->orderBy('created_at', 'desc')
-        ->first();
+            ->where('status', '1')
+            ->where('category', 'MANTENIMIENTO PREVENTIVO (M)')
+            ->with('user', 'manager', 'equipment')
+            ->orderBy('created_at', 'desc')
+            ->first();
 
         $index['lastMaintenanceTicket'] = $lastMaintenanceTicket;
 
         //ultimo ticket de instalacion abierto
         $lastInstallationTicket = Tickets::where('equipment_id', $id)
-        ->where('status', '1')
-        ->where('category', 'INSTALACIÓN (M)')
-        ->with('user', 'manager', 'equipment')
-        ->orderBy('created_at', 'desc')
-        ->first();
+            ->where('status', '1')
+            ->where('category', 'INSTALACIÓN (M)')
+            ->with('user', 'manager', 'equipment')
+            ->orderBy('created_at', 'desc')
+            ->first();
 
         $index['lastInstallationTicket'] = $lastInstallationTicket;
 
@@ -570,16 +570,51 @@ class EquipmentController extends Controller
         }
 
         return view('equipments.history', $index);
-
     }
+
+    // public function etiqueta($id)
+    // {
+    //     // $this->availibility('View orders');
+    //     $pdf['page'] = 'Etiqueta';
+    //     $pdf['equipment'] = Equipment::find($id);
+    //     $pdf = PDF::loadView('equipments.etiqueta', $pdf);
+
+    //     return $pdf->download('etiqueta' . $id . '.pdf');
+    //     // return view('equipments.etiqueta', $pdf);
+    // }
+
+    // public function etiqueta($id)
+    // {
+    //     // Cargar los datos del equipo
+    //     $data['page'] = 'Etiqueta';
+    //     $data['equipment'] = Equipment::find($id);
+
+    //     // Retornar la vista en lugar del PDF
+    //     return view('equipments.etiqueta', $data);
+    // }
 
     public function etiqueta($id)
     {
-        // $this->availibility('View orders');
-        $pdf['page'] = 'Etiqueta';
-        $pdf['equipment'] = Equipment::find($id);
-        $pdf = PDF::loadView('equipments.etiqueta', $pdf);
-        return $pdf->download('etiqueta' . $id . '.pdf');
-        //return view('equipments.etiqueta', $pdf);
+        $data['page'] = 'Etiqueta';
+        $data['equipment'] = Equipment::find($id);
+
+        // Generar PDF con tamaño de página A4 y márgenes ajustados
+        $pdf = PDF::loadView('equipments.etiqueta', $data)
+            ->setPaper('a4', 'portrait')
+            ->setOption('margin-top', '10mm')
+            ->setOption('margin-bottom', '10mm');
+
+        return $pdf->stream();  // Para ver el PDF en el navegador
+        // return $pdf->download('etiqueta' . $id . '.pdf');  // Para descargarlo
     }
+
+
+
+    // public function render_etiqueta($id)
+    // {
+    //     $pdf['page'] = 'Etiqueta';
+    //     $pdf['equipment'] = Equipment::find($id);
+    //     $pdf = PDF::loadView('equipments.etiqueta', $pdf);
+    //     return $pdf->download('etiqueta' . $id . '.pdf');
+    // }
 }

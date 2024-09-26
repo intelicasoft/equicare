@@ -100,6 +100,8 @@ Route::group(['middleware' => ['installed_or_not', 'auth']], function () {
     Route::get('/admin/equipment/qr-image/{id}', [EquipmentController::class,'qr_image'])->name('equipments.qrimage');
     Route::get('/admin/equipments/qr/regen', [EquipmentController::class,'regenerate_all_qr'])->name('equipments.regen');
 
+    // Route::get('/admin/equipments/render_etiqueta/{id}', [EquipmentController::class,'render_etiqueta'])->name('equipments.render_etiqueta');
+
     Route::get('/admin/equipments', [EquipmentController::class,'index'])->name('equipments.index');
     Route::post('/admin/equipments', [EquipmentController::class,'store'])->name('equipments.store');
     Route::get('/admin/equipments/create', [EquipmentController::class,'create'])->name('equipments.create');

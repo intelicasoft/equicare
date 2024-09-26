@@ -23,19 +23,18 @@ class ReviewsController extends Controller
         $index['page'] = 'reviews';
     
     
-        $equipos = Equipment::with(['hospital'])
-            ->leftJoin('reviews', 'equipments.id', '=', 'reviews.equipment_id')
-            ->select('equipments.*', DB::raw('MAX(reviews.created_at) as ultima_fecha_revision'))
-            ->groupBy('equipments.id')
-            ->get();
+        $userId = auth()->user()->id; 
             
         $equipos = Equipment::with(['hospital'])
             ->leftJoin('reviews', 'equipments.id', '=', 'reviews.equipment_id')
+            ->join('hospital_user', 'equipments.hospital_id', '=', 'hospital_user.hospital_id') // Join con la tabla hospital_user
+            ->where('hospital_user.user_id', $userId) // Filtrado por el hospital asignado al usuario
             ->select('equipments.*', 
-                     DB::raw('MAX(reviews.created_at) as ultima_fecha_revision'),
-                     DB::raw('(SELECT description FROM reviews WHERE reviews.equipment_id = equipments.id ORDER BY reviews.created_at DESC LIMIT 1) as description'))
+                    DB::raw('MAX(reviews.created_at) as ultima_fecha_revision'),
+                    DB::raw('(SELECT description FROM reviews WHERE reviews.equipment_id = equipments.id ORDER BY reviews.created_at DESC LIMIT 1) as description'))
             ->groupBy('equipments.id')
             ->get();
+
         return view('reviews.index', $index,['equipos' => $equipos]);
     }
 

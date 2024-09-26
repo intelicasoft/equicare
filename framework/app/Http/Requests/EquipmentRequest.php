@@ -44,16 +44,15 @@ class EquipmentRequest extends FormRequest {
 	// 	];
 	// }
 	public function rules() {
-		// dd($request->all());
 		$dateFormat = env('date_convert', 'Y-m-d');
-
 		$equipmentId = $this->route('equipment');
-
+	
 		return [
 			'hospital_id' => 'required',
 			'sr_no' => [
 				'required',
 				'regex:/^\S*$/',
+				'size:12', // Validación para que tenga exactamente 12 caracteres
 				'unique:equipments,sr_no,' . $equipmentId, // Validación de unicidad
 			],
 			'model' => 'nullable',
@@ -66,16 +65,19 @@ class EquipmentRequest extends FormRequest {
 			'service_engineer_no' => 'nullable|numeric',
 		];
 	}
+	
 	public function messages() {
 		return [
 			'hospital_id.required' => 'El campo Hospital es obligatorio.',
 			'sr_no.required' => 'El campo Número de Serie es obligatorio.',
+			'sr_no.size' => 'El campo Número de Serie debe tener exactamente 12 caracteres.', // Mensaje de error para la regla de tamaño
 			'date_of_purchase.required' => 'El campo Fecha de Compra es obligatorio.',
 			'service_engineer_no.required' => 'El campo número de Ingeniero de Servicio es obligatorio.',
 			'sr_no.regex' => 'El campo Número de Serie no permite espacios en blanco.',
 			'service_engineer_no.numeric' => 'El número de móvil del Ingeniero de Servicio debe ser un número.',
 		];
 	}
+	
 	protected function failedValidation(Validator $validator)
 	{
 		// Check if it's an API request based on the 'Accept' header

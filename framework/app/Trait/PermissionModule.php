@@ -82,6 +82,10 @@ trait PermissionModule {
       'Create orders',
       'Edit orders',
       'Delete orders',
+      'View reviews',
+      'Create reviews',
+      'Edit reviews',
+      'Delete reviews',
     ];
     $index['module_names'] = array_unique(array_map(function ($permission) {
       // Extracting the module name by removing the action part
